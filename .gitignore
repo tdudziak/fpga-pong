@@ -1,0 +1,7 @@
+*.bak
+DE2_115.qsf
+*.qpf
+
+output_files
+db
+incremental_db

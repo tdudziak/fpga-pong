@@ -1,7 +1,13 @@
-*.bak
 DE2_115.qsf
+PLLJ_PLLSPE_INFO.txt
+
+*.bak
 *.qpf
+*.pof
+*.stp
+*.map
 
 output_files
 db
 incremental_db
+simulation/

@@ -24,8 +24,8 @@ module GameGraphics(
     reg [8:0] y;
 
     video_sync_generator(
-        .vga_clk(clk_vga),
-        .reset(rst),
+        .clk_vga(clk_vga),
+        .rst(rst),
         .VGA_BLANK_N(next_BLANK_N),
         .VGA_HS(next_HS),
         .VGA_VS(next_VS)

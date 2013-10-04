@@ -256,11 +256,11 @@ module DE2_115(
         .ball_x(ball_x),
         .ball_y(ball_y),
 
-        .oBLANK_n(VGA_BLANK_N),
-        .oHS(VGA_HS),
-        .oVS(VGA_VS),
-        .b_data(VGA_B),
-        .g_data(VGA_G),
-        .r_data(VGA_R)
+        .VGA_BLANK_N(VGA_BLANK_N),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS),
+        .VGA_R(VGA_R),
+        .VGA_G(VGA_G),
+        .VGA_B(VGA_B)
     );
 endmodule

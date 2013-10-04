@@ -11,49 +11,49 @@ module GameGraphics(
     input [8:0] ball_y,
 
     /* VGA interface */
-    output reg oBLANK_n,
-    output reg oHS,
-    output reg oVS,
-    output [7:0] b_data,
-    output [7:0] g_data,
-    output [7:0] r_data
+    output reg VGA_BLANK_N,
+    output reg VGA_HS,
+    output reg VGA_VS,
+    output [7:0] VGA_B,
+    output [7:0] VGA_G,
+    output [7:0] VGA_R
 );
 
-    wire cBLANK_n, cHS, cVS;
+    wire next_BLANK_N, next_HS, next_VS;
     reg [9:0] x;
     reg [8:0] y;
 
     video_sync_generator(
         .vga_clk(clk_vga),
         .reset(rst),
-        .blank_n(cBLANK_n),
-        .HS(cHS),
-        .VS(cVS)
+        .VGA_BLANK_N(next_BLANK_N),
+        .VGA_HS(next_HS),
+        .VGA_VS(next_VS)
     );
 
-    always@(posedge clk_vga, posedge rst)
+    always @(posedge clk_vga, posedge rst)
     begin
-      if (rst)
-      begin
-         x <= 10'd0;
-          y <= 9'd0;
-      end
-      else if (cHS==1'b0 && cVS==1'b0)
-      begin
-          x <= 10'd0;
-          y <= 9'd0;
-      end
-      else if (cBLANK_n==1'b1) begin
-         // FIXME: ugly magic constant, use signals from the sync generator instead
-          // FIXME: x=0 column is displayed on the right side of the monitor
-          if (x >= `SCREEN_WIDTH-1)
-          begin
-             x <= 10'd0;
-             y <= y + 9'd1;
-          end
-          else
-             x <= x + 9'd1;
-      end
+        if (rst)
+        begin
+            x <= 10'd0;
+            y <= 9'd0;
+        end
+        else if (next_HS == 1'b0 && next_VS == 1'b0)
+        begin
+            x <= 10'd0;
+            y <= 9'd0;
+        end
+        else if (next_BLANK_N == 1'b1) begin
+            // FIXME: ugly magic constant, use signals from the sync generator instead
+            // FIXME: x=0 column is displayed on the right side of the monitor
+            if (x >= `SCREEN_WIDTH-1)
+            begin
+                x <= 10'd0;
+                y <= y + 9'd1;
+            end
+            else
+                x <= x + 9'd1;
+        end
     end
 
     wire img_pad1 = (x > `PAD_DISTANCE) & (x < `PAD_DISTANCE + `PAD_WIDTH)
@@ -68,16 +68,14 @@ module GameGraphics(
 
     wire image = img_pad1 | img_pad2 | img_ball;
 
-    assign r_data = image? 8'hff : 8'h0;
-    assign g_data = image? 8'hff : 8'h0;
-    assign b_data = image? 8'hff : 8'h0;
+    assign VGA_R = image? 8'hff : 8'h0;
+    assign VGA_G = image? 8'hff : 8'h0;
+    assign VGA_B = image? 8'hff : 8'h0;
 
-    /* delay the iHD, iVD,iDEN for one clock cycle; */
-    // TODO: why?
-    always@(negedge clk_vga)
+    always @(negedge clk_vga)
     begin
-      oHS<=cHS;
-      oVS<=cVS;
-      oBLANK_n<=cBLANK_n;
+        VGA_HS <= next_HS;
+        VGA_VS <= next_VS;
+        VGA_BLANK_N <= next_BLANK_N;
     end
 endmodule

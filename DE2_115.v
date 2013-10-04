@@ -250,6 +250,7 @@ module DE2_115(
     GameGraphics(
         .clk_vga(clk_vga),
         .rst(rst),
+        .switch(SW[5:0]),
 
         .pad_left(pad_left),
         .pad_right(pad_right),

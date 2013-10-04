@@ -3,7 +3,7 @@
 `define SCREEN_HEIGHT 480
 
 // space between each pad and screen edge
-`define PAD_DISTANCE 20
+`define PAD_DISTANCE 5
 
 `define PAD_WIDTH 10
 `define PAD_HEIGHT 50

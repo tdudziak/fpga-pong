@@ -1,9 +1,11 @@
-module video_sync_generator(
+module VideoTiming(
     input rst,
     input clk_vga,
     output reg VGA_BLANK_N,
     output reg VGA_HS,
-    output reg VGA_VS
+    output reg VGA_VS,
+    output reg [9:0] x,
+    output reg [8:0] y
 );
 
     /**
@@ -75,6 +77,16 @@ module video_sync_generator(
     wire v_valid = (v_cnt >= v_sync_pulse + v_back_porch)
                 && (v_cnt < v_total - v_front_porch);
 
+    wire [10:0] wide_x = h_valid? (h_cnt - h_sync_pulse - h_back_porch) : 11'd0;
+    wire [9:0]  wide_y = v_valid? (v_cnt - v_sync_pulse - v_back_porch) : 10'd0;
+
+    // TODO: document what exactly happnes on positive and negative edges
+    always @(posedge clk_vga)
+    begin
+        x <= wide_x[9:0];
+        y <= wide_y[8:0];
+    end
+
     always @(negedge clk_vga)
     begin
         VGA_HS <= (h_cnt >= h_sync_pulse);
@@ -84,5 +96,3 @@ module video_sync_generator(
         VGA_BLANK_N <= h_valid && v_valid;
     end
 endmodule
-
-

@@ -3,6 +3,7 @@
 module GameLogic(
     input clk,
     input rst,
+    input random,
 
     /* game state */
     output reg [9:0] pad_left,
@@ -20,61 +21,65 @@ module GameLogic(
     reg [`GAME_SLOWNESS:0] counter;
     always @(posedge clk) counter <= counter + 18'd1;
 
-    /* TODO: document */
-    reg [1:0] vx;
-    reg [1:0] vy;
+    /* ball velocity */
+    reg signed [2:0] vx;
+    reg signed [2:0] vy;
 
-    always @(posedge clk_game, posedge rst)
-        if (rst)
+    /* restart the game at next cycle */
+    reg sched_restart;
+    wire restart = sched_restart || rst;
+
+    always @(posedge clk_game, posedge restart)
+        if (restart)
         begin
-            pad_left <= 0;
-            pad_right <= 0;
-            ball_x <= 300;
-            ball_y <= 200;
-            vx <= 2'b01;
-            vy <= 2'b10;
+            pad_left <= `SCREEN_HEIGHT/2;
+            pad_right <= `SCREEN_HEIGHT/2;
+            ball_x <= `SCREEN_WIDTH/2;
+            ball_y <= `SCREEN_HEIGHT/2;
+            vx <= -3'sd1;
+            vy <= 3'sd1;
+            sched_restart <= 1'b0;
         end
         else
         begin
-            if (keys_left == 2'b10 && pad_left != 0)
-                pad_left <= pad_left - 10'd1;
-            else if (keys_left == 2'b01 && pad_left < `SCREEN_HEIGHT)
-                pad_left <= pad_left + 10'd1;
-
+            /* right pad movement */
             if (keys_right == 2'b10 && pad_right != 0)
                 pad_right <= pad_right - 10'd1;
             else if (keys_right == 2'b01 && pad_right < `SCREEN_HEIGHT)
                 pad_right <= pad_right + 10'd1;
 
-            /* TODO: ball movement and collision detection */
-            if (vx == 2'b01)
-            begin
-                if (ball_x < `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE)
-                    ball_x <= ball_x + 10'd1;
-                else
-                    vx <= ~vx;
-            end
-            else if (vx == 2'b10)
-            begin
-                if (ball_x > `PAD_DISTANCE+`PAD_WIDTH)
-                    ball_x <= ball_x - 10'd1;
-                else
-                    vx <= ~vx;
-            end
+            /* left pad movement */
+            if (keys_left == 2'b10 && pad_left != 0)
+                pad_left <= pad_left - 10'd1;
+            else if (keys_left == 2'b01 && pad_left < `SCREEN_HEIGHT)
+                pad_left <= pad_left + 10'd1;
 
-            if (vy == 2'b01)
+            if (vx > 3'sd0 && ball_x >= `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE)
             begin
-                if (ball_y < `SCREEN_HEIGHT)
-                    ball_y <= ball_y + 10'd1;
+                /* collision with right border */
+                if ((ball_y >= pad_right-`PAD_HEIGHT/2) && (ball_y <= pad_right+`PAD_HEIGHT/2))
+                    vx <= random? -3'sd1 : -3'sd2;
                 else
-                    vy <= ~vy;
+                    sched_restart <= 1'b1;
             end
-            else if (vy == 2'b10)
+            else if (vx < 3'sd0 && ball_x <= `PAD_DISTANCE+`PAD_WIDTH)
             begin
-                if (ball_y > 0)
-                    ball_y <= ball_y - 10'd1;
+                /* collision with left border */
+                if ((ball_y >= pad_left-`PAD_HEIGHT/2) && (ball_y <= pad_left+`PAD_HEIGHT/2))
+                    vx <= random? 3'sd1 : 3'sd2;
                 else
-                    vy <= ~vy;
+                    sched_restart <= 1'b1;
             end
+            else
+                ball_x <= $signed(ball_x) + vx;
+
+            if ((vy > 3'sd0 && ball_y >= `SCREEN_HEIGHT)
+                || (vy < 3'sd0 && ball_y == 0))
+            begin
+                /* collision with top or down */
+                vy <= -vy;
+            end
+            else
+                ball_y <= $signed(ball_y) + vy;
         end
 endmodule

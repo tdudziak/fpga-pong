@@ -6,11 +6,8 @@ module video_sync_generator(
     output reg VGA_VS
 );
 
-    // FIXME: this doesn't add up; seems like H_sync cycle is not included in
-    // h_total (but why does this work, then?)
-
     /**
-     * Horizontal timing (units are pixels):
+     * Horizontal timing (units are pixels; 1 pixel = 39.72ns):
      *              ____________                 ____________
      *             |            |               |            |
      * ____________|   VIDEO    |_______________|   VIDEO    |________
@@ -21,14 +18,14 @@ module video_sync_generator(
      *      <------------A---------->
      */
 
-    parameter h_sync_cycle  = 96;   /* B above */
-    parameter h_back_porch  = 144;  /* C above */
-                                    /* D is the visible area (640 pixels) */
-    parameter h_front_porch = 16;   /* E above; "front porch" */
-    parameter h_total       = 800;  /* A above; total horizontal line length */
+    parameter h_sync_pulse  = 96;   /* B above; about 3.813µs */
+    parameter h_back_porch  = 48;   /* C above; about 1.907µs */
+    parameter h_visible     = 640;  /* D above; about 25.42µs */
+    parameter h_front_porch = 16;   /* E above; about 0.6355µs*/
+    parameter h_total       = 800;  /* A above; 1 line = 31.778µs */
 
     /**
-     * Vertical timing (uints are lines):
+     * Vertical timing (uints are lines; 1 line = h_total pixels):
      *              ____________                 ____________
      *             |            |               |            |
      * ____________|   VIDEO    |_______________|   VIDEO    |________
@@ -39,10 +36,10 @@ module video_sync_generator(
      *      <------------O---------->
      */
 
-    parameter v_sync_cycle  = 2;    /* P above */
-    parameter v_back_porch  = 34;   /* Q above  */
-                                    /* R is the visible area (480 lines) */
-    parameter v_front_porch = 11;   /* S above */
+    parameter v_sync_pulse  = 2;    /* P above; about 63.55µs */
+    parameter v_back_porch  = 33;   /* Q above; about 1049µs  */
+    parameter v_visible     = 480;  /* R above; about 15.25ms */
+    parameter v_front_porch = 10;   /* S above; about 317.8µs */
     parameter v_total       = 525;  /* O above; total number of line cycles */
 
     reg [10:0] h_cnt; /* ranges from 0 to h_total-1 */
@@ -71,20 +68,20 @@ module video_sync_generator(
     end
 
     /* true if we're transmitting pixels in the visible area (D) */
-    wire h_valid =
-        (h_cnt < (h_total-h_front_porch) && h_cnt >= h_back_porch)? 1'b1 : 1'b0;
+    wire h_valid = (h_cnt >= h_sync_pulse + h_back_porch)
+                && (h_cnt < h_total - h_front_porch);
 
     /* true if we're in the visible part of vertical signal (R) */
-    wire vert_valid =
-        (v_cnt < (v_total-v_front_porch) && v_cnt >= v_back_porch)? 1'b1 : 1'b0;
+    wire v_valid = (v_cnt >= v_sync_pulse + v_back_porch)
+                && (v_cnt < v_total - v_front_porch);
 
     always @(negedge clk_vga)
     begin
-        VGA_HS <= (h_cnt < h_sync_cycle)? 1'b0 : 1'b1;
-        VGA_VS <= (v_cnt < v_sync_cycle)? 1'b0 : 1'b1;
+        VGA_HS <= (h_cnt >= h_sync_pulse);
+        VGA_VS <= (v_cnt >= v_sync_pulse);
 
         /* if zero, the DAC ignores VGA_{R,G,B} inputs and outputs nothing */
-        VGA_BLANK_N <= h_valid && vert_valid;
+        VGA_BLANK_N <= h_valid && v_valid;
     end
 endmodule
 

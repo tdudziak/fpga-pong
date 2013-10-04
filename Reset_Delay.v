@@ -9,7 +9,7 @@ module Reset_Delay(
     begin
         if(Cont!=20'hFFFFF)
         begin
-            Cont <= Cont+1;
+            Cont <= Cont + 20'd1;
             oRESET <= 1'b0;
         end
         else

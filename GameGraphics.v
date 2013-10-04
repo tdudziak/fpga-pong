@@ -25,7 +25,7 @@ module GameGraphics(
     wire [9:0] x;
     wire [8:0] y;
 
-    VideoTiming(
+    VideoTiming video_timing(
         .clk_vga(clk_vga),
         .rst(rst),
         .VGA_BLANK_N(VGA_BLANK_N),

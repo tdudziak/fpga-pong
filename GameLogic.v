@@ -18,7 +18,7 @@ module GameLogic(
     /* internal game clock; purposely slowed down */
     wire clk_game = counter[`GAME_SLOWNESS];
     reg [`GAME_SLOWNESS:0] counter;
-    always @(posedge clk) counter <= counter + 1;
+    always @(posedge clk) counter <= counter + 18'd1;
 
     /* TODO: document */
     reg [1:0] vx;
@@ -37,27 +37,27 @@ module GameLogic(
         else
         begin
             if (keys_left == 2'b10 && pad_left != 0)
-                pad_left <= pad_left - 1;
+                pad_left <= pad_left - 10'd1;
             else if (keys_left == 2'b01 && pad_left < `SCREEN_HEIGHT)
-                pad_left <= pad_left + 1;
+                pad_left <= pad_left + 10'd1;
 
             if (keys_right == 2'b10 && pad_right != 0)
-                pad_right <= pad_right - 1;
+                pad_right <= pad_right - 10'd1;
             else if (keys_right == 2'b01 && pad_right < `SCREEN_HEIGHT)
-                pad_right <= pad_right + 1;
+                pad_right <= pad_right + 10'd1;
 
             /* TODO: ball movement and collision detection */
             if (vx == 2'b01)
             begin
                 if (ball_x < `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE)
-                    ball_x <= ball_x + 1;
+                    ball_x <= ball_x + 10'd1;
                 else
                     vx <= ~vx;
             end
             else if (vx == 2'b10)
             begin
                 if (ball_x > `PAD_DISTANCE+`PAD_WIDTH)
-                    ball_x <= ball_x - 1;
+                    ball_x <= ball_x - 10'd1;
                 else
                     vx <= ~vx;
             end
@@ -65,14 +65,14 @@ module GameLogic(
             if (vy == 2'b01)
             begin
                 if (ball_y < `SCREEN_HEIGHT)
-                    ball_y <= ball_y + 1;
+                    ball_y <= ball_y + 10'd1;
                 else
                     vy <= ~vy;
             end
             else if (vy == 2'b10)
             begin
                 if (ball_y > 0)
-                    ball_y <= ball_y - 1;
+                    ball_y <= ball_y - 10'd1;
                 else
                     vy <= ~vy;
             end

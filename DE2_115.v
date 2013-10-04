@@ -202,11 +202,11 @@ module DE2_115(
     /* TODO: deal with this inverted logic madness... */
     wire not_rst, rst;
     assign rst = ~not_rst;
-    Reset_Delay (.iCLK(CLOCK_50), .oRESET(not_rst));
+    Reset_Delay reset_delay(.iCLK(CLOCK_50), .oRESET(not_rst));
 
     /* TODO: do we need all these clocks? */
     wire clk_audio, clk_vga, clk_vga2;
-    VGA_Audio_PLL (
+    VGA_Audio_PLL vga_audio_pll(
         .areset(rst),
         .inclk0(CLOCK2_50),
         .c0(clk_vga),
@@ -233,7 +233,7 @@ module DE2_115(
     wire [9:0] ball_x;
     wire [8:0] ball_y;
 
-    GameLogic(
+    GameLogic game_logic(
         .clk(CLOCK2_50),
         .rst(rst),
 
@@ -247,7 +247,7 @@ module DE2_115(
     );
 
     assign VGA_CLK = clk_vga;
-    GameGraphics(
+    GameGraphics game_graphics(
         .clk_vga(clk_vga),
         .rst(rst),
         .switch(SW[5:0]),

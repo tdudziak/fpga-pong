@@ -226,6 +226,34 @@ module DE2_115(
     /* red LEDs show states of toggle switches */
     assign LEDR = SW;
 
+    /* randomness source */
+    wire [7:0] random;
+    wire entropy = ~(KEY[0] | KEY[1] | KEY[2] | KEY[3]);
+    PseudorandomGenerator prg(CLOCK2_50, rst, entropy, random);
+
+    /* show off randomly generated bits using the green LEDs */
+    reg [32:0] rnd_vis_cnt;
+    reg [7:0] rnd_vis;
+    assign LEDG = { 1'b0, rnd_vis };
+    always @(posedge CLOCK2_50)
+    begin
+        if (rst)
+        begin
+            rnd_vis <= 8'b01010101;
+            rnd_vis_cnt <= 32'd0;
+        end
+        else
+        begin
+            if (rnd_vis_cnt == 32'd50000000)
+            begin
+                rnd_vis_cnt <= 32'd0;
+                rnd_vis <= ~random;
+            end
+            else
+                rnd_vis_cnt <= rnd_vis_cnt + 32'd1;
+        end
+    end
+
     /* game state: goes from GameLogic to GameGraphics */
     wire [9:0] pad_left;
     wire [9:0] pad_right;
@@ -235,7 +263,7 @@ module DE2_115(
     GameLogic game_logic(
         .clk(CLOCK2_50),
         .rst(rst),
-        .random(SW[7:0]), // FIXME: toggle switch is not a good entropy source :)
+        .random(random),
 
         .pad_left(pad_left),
         .pad_right(pad_right),

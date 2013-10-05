@@ -60,8 +60,8 @@ module GameLogic(
             pad_right <= `SCREEN_HEIGHT/2;
             ball_x <= `SCREEN_WIDTH/2;
             ball_y <= `SCREEN_HEIGHT/2;
-            vx <= random[0]? -3'sd1 : +3'sd1;
-            vy <= random[1]? -3'sd1 : +3'sd1;
+            vx <= random[7]? -3'sd1 : +3'sd1;
+            vy <= random[3]? -3'sd1 : +3'sd1;
             sched_restart <= 1'b0;
         end
         else

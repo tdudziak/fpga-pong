@@ -33,16 +33,16 @@ module GameLogic(
     wire collides_top = (vy > 3'sd0 && ball_y >= `SCREEN_HEIGHT);
 
     /* ball colides with the bottom screen edge */
-    wire collides_bottom = (vy < 3'sd0 && ball_y == 0);
+    wire collides_bottom = (vy < 3'sd0 && ball_y == 9'd0);
 
     /* ball will cross the line `PAD_WIDTH+`PAD_DISTANCE pixels from the right
        edge; it either has to bounce or it's game over */
     wire collides_right = (vx > 3'sd0)
-                       && (ball_x >= `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE);
+                       && (ball_x >= `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE-2);
 
     /* same for left edge */
     wire collides_left = (vx < 3'sd0)
-                      && (ball_x <= `PAD_DISTANCE+`PAD_WIDTH);
+                      && (ball_x <= `PAD_DISTANCE+`PAD_WIDTH+2);
 
 
     /* is ball's y-coordinate within boundaries of the right pad? */
@@ -82,14 +82,14 @@ module GameLogic(
             if (collides_right)
             begin
                 if (matches_right)
-                    vx <= (random[1:0] == 2'd0)? -3'sd1 : -3'sd2;
+                    vx <= (random[2:0] == 2'd0)? -3'sd1 : -3'sd2;
                 else
                     sched_restart <= 1'b1;
             end
             else if (collides_left)
             begin
                 if (matches_left)
-                    vx <= (random[1:0] == 2'd0)? 3'sd1 : 3'sd2;
+                    vx <= (random[2:0] == 2'd0)? 3'sd1 : 3'sd2;
                 else
                     sched_restart <= 1'b1;
             end

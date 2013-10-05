@@ -6,7 +6,7 @@
 `define PAD_DISTANCE 5
 
 `define PAD_WIDTH 10
-`define PAD_HEIGHT 50
+`define PAD_HEIGHT 70
 `define BALL_SIZE 6
 
 // vaguely related to how fast the pads are moving (smaller is faster)

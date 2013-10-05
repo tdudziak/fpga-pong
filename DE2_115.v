@@ -235,7 +235,7 @@ module DE2_115(
     GameLogic game_logic(
         .clk(CLOCK2_50),
         .rst(rst),
-        .random(SW[17]), // FIXME: toggle switch is not a good entropy source :)
+        .random(SW[7:0]), // FIXME: toggle switch is not a good entropy source :)
 
         .pad_left(pad_left),
         .pad_right(pad_right),

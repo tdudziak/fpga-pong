@@ -53,7 +53,7 @@ module GameLogic(
     wire matches_left = (ball_y >= pad_left - `PAD_HEIGHT/2)
                      && (ball_y <= pad_left + `PAD_HEIGHT/2);
 
-    always @(posedge clk_game, posedge restart)
+    always @(posedge clk_game)
         if (restart)
         begin
             pad_left <= `SCREEN_HEIGHT/2;

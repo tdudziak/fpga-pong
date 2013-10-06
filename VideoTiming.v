@@ -47,7 +47,7 @@ module VideoTiming(
     reg [10:0] h_cnt; /* ranges from 0 to h_total-1 */
     reg [9:0]  v_cnt; /* ranges from 0 to v_total-1 */
 
-    always @(negedge clk_vga, posedge rst)
+    always @(negedge clk_vga)
     begin
         if (rst)
         begin

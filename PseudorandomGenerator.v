@@ -8,7 +8,7 @@ module PseudorandomGenerator(
     reg [15:0] state;
     assign random = state[11:4];
 
-    always @(posedge clk, posedge rst)
+    always @(posedge clk)
     begin
         if (rst)
             state <= 16'b1;

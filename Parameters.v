@@ -10,4 +10,4 @@
 `define BALL_SIZE 6
 
 // vaguely related to how fast the pads are moving (smaller is faster)
-`define GAME_SLOWNESS 17
+`define GAME_SLOWNESS 16

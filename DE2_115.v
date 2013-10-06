@@ -199,11 +199,9 @@ module DE2_115(
     assign GPIO         = 36'hzzzzzzzz;
 
     /* reset delay timer */
-    /* TODO: deal with this inverted logic madness... */
-    wire not_rst, rst = ~not_rst | SW[16];
-    Reset_Delay reset_delay(.iCLK(CLOCK_50), .oRESET(not_rst));
+    ResetLogic reset_logic(clk, SW[16], rst);
 
-    /* TODO: do we need all these clocks? */
+    /* TODO: reconfigure the PLL, we need only clk_vga */
     wire clk_audio, clk_vga, clk_vga2;
     VGA_Audio_PLL vga_audio_pll(
         .areset(rst),
@@ -229,13 +227,13 @@ module DE2_115(
     /* randomness source */
     wire [7:0] random;
     wire entropy = ~(KEY[0] | KEY[1] | KEY[2] | KEY[3]);
-    PseudorandomGenerator prg(CLOCK2_50, rst, entropy, random);
+    PseudorandomGenerator prg(clk_vga, rst, entropy, random);
 
     /* show off randomly generated bits using the green LEDs */
     reg [32:0] rnd_vis_cnt;
     reg [7:0] rnd_vis;
     assign LEDG = { 1'b0, rnd_vis };
-    always @(posedge CLOCK2_50)
+    always @(posedge clk_vga)
     begin
         if (rst)
         begin
@@ -261,7 +259,7 @@ module DE2_115(
     wire [8:0] ball_y;
 
     GameLogic game_logic(
-        .clk(CLOCK2_50),
+        .clk(clk_vga),
         .rst(rst),
         .random(random),
 

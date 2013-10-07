@@ -204,13 +204,11 @@ module DE2_115(
     Reset_Delay reset_delay(.iCLK(CLOCK_50), .oRESET(not_rst));
 
     /* TODO: do we need all these clocks? */
-    wire clk_audio, clk_vga, clk_vga2;
+    wire clk_vga;
     VGA_Audio_PLL vga_audio_pll(
         .areset(rst),
         .inclk0(CLOCK2_50),
-        .c0(clk_vga),
-        .c1(clk_audio),
-        .c2(clk_vga2)
+        .c0(clk_vga)
     );
 
     /* power down seven-segment displays */
@@ -255,10 +253,10 @@ module DE2_115(
     end
 
     /* game state: goes from GameLogic to GameGraphics */
-    wire [9:0] pad_left;
-    wire [9:0] pad_right;
-    wire [9:0] ball_x;
-    wire [8:0] ball_y;
+    wire [11:0] pad_left;
+    wire [11:0] pad_right;
+    wire [11:0] ball_x;
+    wire [11:0] ball_y;
 
     GameLogic game_logic(
         .clk(CLOCK2_50),

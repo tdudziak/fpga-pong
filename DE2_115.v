@@ -204,7 +204,6 @@ module DE2_115(
 
     wire clk_vga;
     VGA_Audio_PLL vga_audio_pll(
-        .areset(1'b0), // TODO: reconfigure the PLL and get rid of this
         .inclk0(CLOCK2_50),
         .c0(clk_vga)
     );

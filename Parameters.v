@@ -1,13 +1,15 @@
 // all dimensions in pixels
-`define SCREEN_WIDTH 640
-`define SCREEN_HEIGHT 480
+`define SCREEN_WIDTH 1024
+`define SCREEN_HEIGHT 768
 
 // space between each pad and screen edge
-`define PAD_DISTANCE 5
+`define PAD_DISTANCE 10
 
-`define PAD_WIDTH 10
-`define PAD_HEIGHT 70
-`define BALL_SIZE 6
+`define PAD_WIDTH 12
+`define PAD_HEIGHT 140
+
+// ball radius is equal to sqrt(2**BALL_SIZE_LOG2) = 2**(BALL_SIZE_LOG2/2)
+`define BALL_SIZE_LOG2 6
 
 // vaguely related to how fast the pads are moving (smaller is faster)
-`define GAME_SLOWNESS 16
+`define GAME_SLOWNESS 17

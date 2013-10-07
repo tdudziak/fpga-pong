@@ -199,16 +199,14 @@ module DE2_115(
     assign GPIO         = 36'hzzzzzzzz;
 
     /* reset delay timer */
-    ResetLogic reset_logic(clk, SW[16], rst);
+    wire rst;
+    ResetLogic reset_logic(clk_vga, SW[16], rst);
 
-    /* TODO: reconfigure the PLL, we need only clk_vga */
-    wire clk_audio, clk_vga, clk_vga2;
+    wire clk_vga;
     VGA_Audio_PLL vga_audio_pll(
-        .areset(rst),
+        .areset(1'b0), // TODO: reconfigure the PLL and get rid of this
         .inclk0(CLOCK2_50),
-        .c0(clk_vga),
-        .c1(clk_audio),
-        .c2(clk_vga2)
+        .c0(clk_vga)
     );
 
     /* power down seven-segment displays */
@@ -253,10 +251,10 @@ module DE2_115(
     end
 
     /* game state: goes from GameLogic to GameGraphics */
-    wire [9:0] pad_left;
-    wire [9:0] pad_right;
-    wire [9:0] ball_x;
-    wire [8:0] ball_y;
+    wire [11:0] pad_left;
+    wire [11:0] pad_right;
+    wire [11:0] ball_x;
+    wire [11:0] ball_y;
 
     GameLogic game_logic(
         .clk(clk_vga),

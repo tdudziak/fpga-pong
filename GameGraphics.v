@@ -8,10 +8,10 @@ module GameGraphics(
     input [5:0] switch,
 
     /* game state: pad and ball positions */
-    input [8:0] pad_left,
-    input [8:0] pad_right,
-    input [9:0] ball_x,
-    input [8:0] ball_y,
+    input [11:0] pad_left,
+    input [11:0] pad_right,
+    input [11:0] ball_x,
+    input [11:0] ball_y,
 
     /* VGA interface */
     output VGA_BLANK_N,
@@ -22,8 +22,8 @@ module GameGraphics(
     output [7:0] VGA_R
 );
 
-    wire [9:0] x;
-    wire [8:0] y;
+    wire [11:0] x;
+    wire [11:0] y;
 
     VideoTiming video_timing(
         .clk_vga(clk_vga),
@@ -35,7 +35,7 @@ module GameGraphics(
         .y(y)
     );
 
-    wire img_frame = (x == 10'd0) || (x == `SCREEN_WIDTH-10'd1)
+    wire img_frame = (x == 12'd0) || (x == `SCREEN_WIDTH-12'd1)
                   || (y == 9'd0)  || (y == `SCREEN_HEIGHT-9'd1);
 
     wire img_pad1 = (x > `PAD_DISTANCE) & (x < `PAD_DISTANCE + `PAD_WIDTH)
@@ -45,15 +45,23 @@ module GameGraphics(
                   & (x > `SCREEN_WIDTH - `PAD_DISTANCE - `PAD_WIDTH)
                   & (y + `PAD_HEIGHT/2 > pad_right) & (y < pad_right + `PAD_HEIGHT/2);
 
-    wire img_ball = (x + `BALL_SIZE/2 > ball_x) & (x < ball_x + `BALL_SIZE/2)
-                  & (y + `BALL_SIZE/2 > ball_y) & (y < ball_y + `BALL_SIZE/2);
+    wire [23:0] ball_dist = (x-ball_x)*(x-ball_x) + (y-ball_y)*(y-ball_y);
+    
+   /*
+    wire [7:0] ball_lum =
+        (ball_dist > BOR2)? 8'd0 :
+            (ball_dist < BIR2)? 8'hff : (BOR2 - ball_dist); */
 
-    wire image = img_frame | img_pad1 | img_pad2 | img_ball;
+    wire [7:0] ball_lum =
+        (ball_dist[23:`BALL_SIZE_LOG2] != 0)? 8'h00
+        : ~ball_dist[(`BALL_SIZE_LOG2-1):0] << (8-`BALL_SIZE_LOG2);
+
+    wire image = img_frame | img_pad1 | img_pad2;
 
     wire background = (switch[0] & (x[1] ^ y[1]))
                     | (switch[1] & (x[4] ^ y[4]));
 
-    wire [7:0] f_lum = image? 8'hff : 8'h00;
+    wire [7:0] f_lum = image? 8'hff : ball_lum;
     wire [7:0] b_lum = background? 8'h60 : 8'h00;
 
     assign VGA_R = switch[2]? (b_lum | f_lum) : f_lum;

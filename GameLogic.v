@@ -6,10 +6,10 @@ module GameLogic(
     input [7:0] random,
 
     /* game state */
-    output reg [9:0] pad_left,
-    output reg [9:0] pad_right,
-    output reg [9:0] ball_x,
-    output reg [8:0] ball_y,
+    output reg [11:0] pad_left,
+    output reg [11:0] pad_right,
+    output reg [11:0] ball_x,
+    output reg [11:0] ball_y,
 
     /* controls */
     input [1:0] keys_left,
@@ -68,15 +68,15 @@ module GameLogic(
         begin
             /* right pad movement */
             if (keys_right == 2'b10 && pad_right >= 2+`PAD_HEIGHT/2)
-                pad_right <= pad_right - 10'd2;
+                pad_right <= pad_right - 12'd2;
             else if (keys_right == 2'b01 && pad_right <= `SCREEN_HEIGHT-2-`PAD_HEIGHT/2)
-                pad_right <= pad_right + 10'd2;
+                pad_right <= pad_right + 12'd2;
 
             /* left pad movement */
             if (keys_left == 2'b10 && pad_left >= 2+`PAD_HEIGHT/2)
-                pad_left <= pad_left - 10'd2;
+                pad_left <= pad_left - 12'd2;
             else if (keys_left == 2'b01 && pad_left <= `SCREEN_HEIGHT-2-`PAD_HEIGHT/2)
-                pad_left <= pad_left + 10'd2;
+                pad_left <= pad_left + 12'd2;
 
             /* ball movement */
             if (collides_right)

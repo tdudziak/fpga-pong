@@ -7,16 +7,19 @@ module ResetLogic(
     parameter reset_val = 20'hfffff;
     reg [19:0] counter;
 
-    always @(posedge clk, negedge rst_button)
+    always @(posedge clk, posedge rst_button)
     begin
-        if (rst_button == 1'b0 || counter == reset_val)
+        if (rst_button)
             rst <= 1'b1;
-        else if (rst == 1'b1)
-            rst <= 1'b0;
-        else if (counter != reset_val)
+        else
         begin
-            rst <= 1'b0;
-            counter <= counter + 20'd1;
+            if (counter != reset_val)
+            begin
+                counter <= counter + 20'd1;
+                rst <= 1'b1;
+            end
+            else
+                rst <= 1'b0;
         end
     end
 endmodule

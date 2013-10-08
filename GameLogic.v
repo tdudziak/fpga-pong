@@ -13,13 +13,14 @@ module GameLogic(
 
     /* controls */
     input [1:0] keys_left,
-    input [1:0] keys_right
+    input [1:0] keys_right,
+    input pause
 );
 
     /* internal game clock; purposely slowed down */
     wire clk_game = counter[`GAME_SLOWNESS];
     reg [`GAME_SLOWNESS:0] counter;
-    always @(posedge clk) counter <= counter + 18'd1;
+    always @(posedge clk) counter <= counter + 1;
 
     /* ball velocity */
     reg signed [2:0] vx;
@@ -30,19 +31,19 @@ module GameLogic(
     wire restart = sched_restart || rst;
 
     /* ball colides with the top screen edge */
-    wire collides_top = (vy > 3'sd0 && ball_y >= `SCREEN_HEIGHT);
+    wire collides_top = (vy > 3'sd0 && ball_y >= `SCREEN_HEIGHT-`BALL_SIZE_INNER);
 
     /* ball colides with the bottom screen edge */
-    wire collides_bottom = (vy < 3'sd0 && ball_y == 9'd0);
+    wire collides_bottom = (vy < 3'sd0 && ball_y <= `BALL_SIZE_INNER);
 
     /* ball will cross the line `PAD_WIDTH+`PAD_DISTANCE pixels from the right
        edge; it either has to bounce or it's game over */
     wire collides_right = (vx > 3'sd0)
-                       && (ball_x >= `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE-2);
+                       && (ball_x >= `SCREEN_WIDTH-`PAD_WIDTH-`PAD_DISTANCE-2-`BALL_SIZE_INNER);
 
     /* same for left edge */
     wire collides_left = (vx < 3'sd0)
-                      && (ball_x <= `PAD_DISTANCE+`PAD_WIDTH+2);
+                      && (ball_x <= `PAD_DISTANCE+`PAD_WIDTH+2+`BALL_SIZE_INNER);
 
 
     /* is ball's y-coordinate within boundaries of the right pad? */
@@ -64,7 +65,7 @@ module GameLogic(
             vy <= random[3]? -3'sd1 : +3'sd1;
             sched_restart <= 1'b0;
         end
-        else
+        else if(!pause)
         begin
             /* right pad movement */
             if (keys_right == 2'b10 && pad_right >= 2+`PAD_HEIGHT/2)

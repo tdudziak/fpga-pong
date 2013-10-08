@@ -266,7 +266,8 @@ module DE2_115(
         .ball_y(ball_y),
 
         .keys_left(KEY[3:2]),
-        .keys_right(KEY[1:0])
+        .keys_right(KEY[1:0]),
+        .pause(SW[17])
     );
 
     assign VGA_CLK = clk_vga;

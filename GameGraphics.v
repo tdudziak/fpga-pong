@@ -46,15 +46,13 @@ module GameGraphics(
                   & (y + `PAD_HEIGHT/2 > pad_right) & (y < pad_right + `PAD_HEIGHT/2);
 
     wire [23:0] ball_dist = (x-ball_x)*(x-ball_x) + (y-ball_y)*(y-ball_y);
+    wire [23:0] ball_edist = (ball_dist >= `BALL_SIZE_INNER)?
+        ball_dist - `BALL_SIZE_INNER
+        : 24'd0;
     
-   /*
     wire [7:0] ball_lum =
-        (ball_dist > BOR2)? 8'd0 :
-            (ball_dist < BIR2)? 8'hff : (BOR2 - ball_dist); */
-
-    wire [7:0] ball_lum =
-        (ball_dist[23:`BALL_SIZE_LOG2] != 0)? 8'h00
-        : ~ball_dist[(`BALL_SIZE_LOG2-1):0] << (8-`BALL_SIZE_LOG2);
+        (ball_edist[23:`BALL_EDGE_LOG2] != 0)? 8'h00
+        : ~ball_edist[(`BALL_EDGE_LOG2-1):0] << (8-`BALL_EDGE_LOG2);
 
     wire image = img_frame | img_pad1 | img_pad2;
 

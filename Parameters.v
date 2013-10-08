@@ -6,10 +6,10 @@
 `define PAD_DISTANCE 10
 
 `define PAD_WIDTH 12
-`define PAD_HEIGHT 140
+`define PAD_HEIGHT 100
 
-// ball radius is equal to sqrt(2**BALL_SIZE_LOG2) = 2**(BALL_SIZE_LOG2/2)
-`define BALL_SIZE_LOG2 6
+`define BALL_EDGE_LOG2 4
+`define BALL_SIZE_INNER 12
 
 // vaguely related to how fast the pads are moving (smaller is faster)
 `define GAME_SLOWNESS 17
